@@ -53,7 +53,8 @@ class _BarChartRace(CommonChart):
                  colors, title, bar_size, bar_textposition, bar_texttemplate, bar_label_font, 
                  tick_label_font, tick_template, shared_fontdict, scale, fig, writer, 
                  bar_kwargs, fig_kwargs, filter_column_colors, 
-                 img_label_folder,tick_label_mode,tick_image_mode):
+                 img_label_folder,tick_label_mode,tick_image_mode,
+                 bar_colors=None):
         self.filename = filename
         self.extension = self.get_extension()
         self.orientation = orientation
@@ -1085,5 +1086,6 @@ def bar_chart_race(df, filename=None, orientation='h', sort='desc', n_bars=None,
                         colors, title, bar_size, bar_textposition, bar_texttemplate, 
                         bar_label_font, tick_label_font, tick_template, shared_fontdict, scale, 
                         fig, writer, bar_kwargs, fig_kwargs, filter_column_colors, 
-                        img_label_folder,tick_label_mode,tick_image_mode)
+                        img_label_folder,tick_label_mode,tick_image_mode,
+                        bar_colors=bar_colors) 
     return bcr.make_animation()
