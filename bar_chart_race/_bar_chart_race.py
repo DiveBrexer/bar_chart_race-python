@@ -338,8 +338,8 @@ class _BarChartRace(CommonChart):
     def get_bar_colors(self, colors):
         self.bar_colors = None
 
-        if self.bar_colors is not None:
-            return np.array(self.bar_colors[:self.df_values.shape[1]])
+        # if self.bar_colors is not None:
+        #     return np.array(self.bar_colors[:self.df_values.shape[1]])
         
         if colors is None:
             colors = 'dark12'
