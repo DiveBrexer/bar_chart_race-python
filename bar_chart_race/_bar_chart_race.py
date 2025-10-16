@@ -688,12 +688,16 @@ def bar_chart_race(df, filename=None, orientation='h', sort='desc', n_bars=None,
                    fixed_order=False, fixed_max=False, steps_per_period=10, 
                    period_length=500, end_period_pause=0, interpolate_period=False, 
                    period_label=True, period_template=None, period_summary_func=None,
-                   perpendicular_bar_func=None, colors=None, title=None, bar_size=.95,
+                   perpendicular_bar_func=None,
+                   # colors=None,
+                   colors = bar_colors or ['#999999'] * len(df.columns),
+                   title=None, bar_size=.95,
                    bar_textposition='outside', bar_texttemplate='{x:,.0f}',
                    bar_label_font=None, tick_label_font=None, tick_template='{x:,.0f}',
                    shared_fontdict=None, scale='linear', fig=None, writer=None, bar_kwargs=None, 
                    fig_kwargs=None, filter_column_colors=False,
-                   img_label_folder=None,tick_label_mode='image',tick_image_mode='trailing'):
+                   img_label_folder=None,tick_label_mode='image',tick_image_mode='trailing',
+                   bar_colors=None):
     '''
     Create an animated bar chart race using matplotlib. Data must be in 
     'wide' format where each row represents a single time period and each 
