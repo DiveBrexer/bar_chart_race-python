@@ -513,6 +513,9 @@ class _BarChartRace(CommonChart):
             axis.set_major_formatter(self.tick_template)
 
     def plot_bars(self, ax, i):
+        if hasattr(self, 'custom_tick_values'):
+            ax.set_xticks(self.custom_tick_values)
+
         bar_location, bar_length, cols, colors = self.get_bar_info(i)
         if self.orientation == 'h':
             ax.barh(bar_location, bar_length, tick_label=cols, 
