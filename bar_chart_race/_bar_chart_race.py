@@ -54,7 +54,8 @@ class _BarChartRace(CommonChart):
                  tick_label_font, tick_template, shared_fontdict, scale, fig, writer, 
                  bar_kwargs, fig_kwargs, filter_column_colors, 
                  img_label_folder,tick_label_mode,tick_image_mode,
-                 bar_colors=None):
+                 bar_colors=None,
+                 custom_tick_values=Non):
         self.filename = filename
         self.extension = self.get_extension()
         self.orientation = orientation
@@ -101,6 +102,7 @@ class _BarChartRace(CommonChart):
         self.img_label_artist = []     #stores image artists
 
         self.bar_colors = bar_colors
+        self.custom_tick_values = custom_tick_values
 
 
     def validate_params(self):
@@ -513,7 +515,7 @@ class _BarChartRace(CommonChart):
             axis.set_major_formatter(self.tick_template)
 
     def plot_bars(self, ax, i):
-        if hasattr(self, 'custom_tick_values'):
+        if hasattr(self, 'custom_tick_values') and self.custom_tick_values is not None:
             ax.set_xticks(self.custom_tick_values)
 
         bar_location, bar_length, cols, colors = self.get_bar_info(i)
