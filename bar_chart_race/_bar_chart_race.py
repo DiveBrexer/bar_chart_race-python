@@ -48,14 +48,15 @@ def get_image_name(col_name):
 class _BarChartRace(CommonChart):
     
     def __init__(self, df, filename, orientation, sort, n_bars, fixed_order, fixed_max,
-                 steps_per_period, period_length, end_period_pause, interpolate_period, 
-                 period_label, period_template, period_summary_func, perpendicular_bar_func, 
-                 colors, title, bar_size, bar_textposition, bar_texttemplate, bar_label_font, 
-                 tick_label_font, tick_template, shared_fontdict, scale, fig, writer, 
-                 bar_kwargs, fig_kwargs, filter_column_colors, 
-                 img_label_folder,tick_label_mode,tick_image_mode,
-                 bar_colors=None,
-                 custom_tick_values=Non):
+             steps_per_period, period_length, end_period_pause, interpolate_period, 
+             period_label, period_template, period_summary_func, perpendicular_bar_func, 
+             colors, title, bar_size, bar_textposition, bar_texttemplate, bar_label_font, 
+             tick_label_font, tick_template, shared_fontdict, scale, fig, writer, 
+             bar_kwargs, fig_kwargs, filter_column_colors, 
+             img_label_folder, tick_label_mode, tick_image_mode,
+             bar_colors=None,
+             custom_tick_values=None):  # ← Typo修正: 'Non' → 'None'
+
         self.filename = filename
         self.extension = self.get_extension()
         self.orientation = orientation
@@ -103,6 +104,7 @@ class _BarChartRace(CommonChart):
 
         self.bar_colors = bar_colors
         self.custom_tick_values = custom_tick_values
+
 
 
     def validate_params(self):
@@ -515,6 +517,7 @@ class _BarChartRace(CommonChart):
             axis.set_major_formatter(self.tick_template)
 
     def plot_bars(self, ax, i):
+        # ✅ custom_tick_values を使って x軸の目盛りを設定
         if hasattr(self, 'custom_tick_values') and self.custom_tick_values is not None:
             ax.set_xticks(self.custom_tick_values)
 
