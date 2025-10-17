@@ -515,12 +515,8 @@ class _BarChartRace(CommonChart):
             axis.set_major_formatter(self.tick_template)
 
     def plot_bars(self, ax, i):
-        # ✅ custom_tick_values が指定されている場合、x軸 or y軸に反映
         if hasattr(self, 'custom_tick_values') and self.custom_tick_values is not None:
-            if self.orientation == 'h':
-                ax.set_xticks(self.custom_tick_values)
-            else:
-                ax.set_yticks(self.custom_tick_values)
+            ax.set_xticks(self.custom_tick_values)
     
         bar_location, bar_length, cols, colors = self.get_bar_info(i)
     
