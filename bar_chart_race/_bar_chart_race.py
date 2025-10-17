@@ -105,8 +105,6 @@ class _BarChartRace(CommonChart):
         self.bar_colors = bar_colors
         self.custom_tick_values = custom_tick_values
 
-
-
     def validate_params(self):
         if isinstance(self.filename, str):
             if '.' not in self.filename:
@@ -517,38 +515,43 @@ class _BarChartRace(CommonChart):
             axis.set_major_formatter(self.tick_template)
 
     def plot_bars(self, ax, i):
-        # ✅ custom_tick_values を使って x軸の目盛りを設定
+        # ✅ custom_tick_values が指定されている場合、x軸 or y軸に反映
         if hasattr(self, 'custom_tick_values') and self.custom_tick_values is not None:
-            ax.set_xticks(self.custom_tick_values)
-
+            if self.orientation == 'h':
+                ax.set_xticks(self.custom_tick_values)
+            else:
+                ax.set_yticks(self.custom_tick_values)
+    
         bar_location, bar_length, cols, colors = self.get_bar_info(i)
+    
         if self.orientation == 'h':
             ax.barh(bar_location, bar_length, tick_label=cols, 
                     color=colors, **self.bar_kwargs)
-            ax.set_yticklabels(ax.get_yticklabels(), **self.tick_label_font,wrap=True)#,visible=False)
-            #ax.set_yticklabels([])
-            #ax.tick_params(top=False, bottom=False, left=False, right=False, labelleft=True, labelbottom=True)
+            ax.set_yticklabels(ax.get_yticklabels(), **self.tick_label_font, wrap=True)
+    
             if not self.fixed_max and self.bar_textposition == 'outside':
                 max_bar = bar_length.max()
                 new_max_pixels = ax.transData.transform((max_bar, 0))[0] + self.extra_pixels
                 new_xmax = ax.transData.inverted().transform((new_max_pixels, 0))[0]
-                ax.set_xlim(ax.get_xlim()[0] , new_xmax)
+                ax.set_xlim(ax.get_xlim()[0], new_xmax)
+    
         else:
             ax.bar(bar_location, bar_length, tick_label=cols, 
                    color=colors, **self.bar_kwargs)
             ax.set_xticklabels(ax.get_xticklabels(), **self.tick_label_font)
+    
             if not self.fixed_max and self.bar_textposition == 'outside':
                 max_bar = bar_length.max()
                 new_max_pixels = ax.transData.transform((0, max_bar))[1] + self.extra_pixels
                 new_ymax = ax.transData.inverted().transform((0, new_max_pixels))[1]
                 ax.set_ylim(ax.get_ylim()[0], new_ymax)
-
-        if self.img_label_folder:           #here I am handling the addition of images as the bar tick labels
-            zipped = zip(bar_location,bar_length,cols)
-            for bar_loc,bar_len,col_name in zipped:
-                #self.offset_image(bar_loc,bar_len,col_name,ax)
-                self._add_tick_label_offset_image(bar_loc,bar_len,col_name,ax)
-
+    
+        # ✅ チームロゴ画像などの描画
+        if self.img_label_folder:
+            for bar_loc, bar_len, col_name in zip(bar_location, bar_length, cols):
+                self._add_tick_label_offset_image(bar_loc, bar_len, col_name, ax)
+    
+        # ✅ 追加描画要素
         self.set_major_formatter(ax)
         self.add_period_label(ax, i)
         self.add_period_summary(ax, i)
