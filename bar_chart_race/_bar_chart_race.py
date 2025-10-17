@@ -55,7 +55,7 @@ class _BarChartRace(CommonChart):
              bar_kwargs, fig_kwargs, filter_column_colors, 
              img_label_folder, tick_label_mode, tick_image_mode,
              bar_colors=None,
-             custom_tick_values=None):  # ← Typo修正: 'Non' → 'None'
+             custom_tick_values=None):
 
         self.filename = filename
         self.extension = self.get_extension()
