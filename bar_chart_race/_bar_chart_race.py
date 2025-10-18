@@ -658,6 +658,10 @@ class _BarChartRace(CommonChart):
             self.plot_bars(ax, 0)
             # self.fig.tight_layout()
 
+            if hasattr(self, 'custom_tick_values') and self.custom_tick_values is not None:
+                ax.set_xticks(self.custom_tick_values)
+                ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: f'{x:.1f}'))
+
         interval = self.period_length / self.steps_per_period
         pause = int(self.end_period_pause // interval)
 
