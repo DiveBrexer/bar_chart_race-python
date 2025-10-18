@@ -517,7 +517,7 @@ class _BarChartRace(CommonChart):
     def plot_bars(self, ax, i):
         if hasattr(self, 'custom_tick_values') and self.custom_tick_values is not None:
             ax.set_xticks(self.custom_tick_values)
-            ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: f'{x:.1f}'))
+            ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: f'{x:.3f}'))
     
         bar_location, bar_length, cols, colors = self.get_bar_info(i)
     
