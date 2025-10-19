@@ -657,10 +657,12 @@ class _BarChartRace(CommonChart):
             ax = self.fig.axes[0]
             self.plot_bars(ax, 0)
             # self.fig.tight_layout()
-
+            
             if hasattr(self, 'custom_tick_values') and self.custom_tick_values is not None:
                 ax.set_xticks(self.custom_tick_values)
-                ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: f'{x:.1f}'))
+                ax.xaxis.set_major_formatter(
+                    ticker.FuncFormatter(lambda x, _: f'{x:.3f}')
+                )
 
         interval = self.period_length / self.steps_per_period
         pause = int(self.end_period_pause // interval)
@@ -716,7 +718,8 @@ def bar_chart_race(df, filename=None, orientation='h', sort='desc', n_bars=None,
                    shared_fontdict=None, scale='linear', fig=None, writer=None, bar_kwargs=None, 
                    fig_kwargs=None, filter_column_colors=False,
                    img_label_folder=None, tick_label_mode='image', tick_image_mode='trailing',
-                   bar_colors=None):
+                   bar_colors=None,
+                   custom_tick_values=None):
  
 
     '''
