@@ -524,6 +524,13 @@ class _BarChartRace(CommonChart):
         bar_length = self.df_values.iloc[i].values
         cols = self.df_values.columns
         
+        # ✅ X軸範囲固定（勝率 0.000〜1.000）
+        ax.set_xlim(0, 1.0)
+
+        # ✅ X軸ラベルを 0.200 刻み（小数第3位まで）
+        ax.set_xticks(np.arange(0, 1.01, 0.2))
+        ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: f"{x:.3f}"))
+
         # ✅ バーカラーの適用
         if self.bar_colors is not None:
             if isinstance(self.bar_colors, np.ndarray):
@@ -679,7 +686,6 @@ class _BarChartRace(CommonChart):
         self.plot_bars(ax, i)
         # self.fig.tight_layout()
         
-        
     def make_animation(self):
         def init_func():
             ax = self.fig.axes[0]
@@ -687,11 +693,9 @@ class _BarChartRace(CommonChart):
             # self.fig.tight_layout()
 
             # ✅ x軸カスタム反映
-            if hasattr(self, "custom_tick_values") and self.custom_tick_values is not None:
+            if hasattr(self, 'custom_tick_values') and self.custom_tick_values is not None:
                 ax.set_xticks(self.custom_tick_values)
-                ax.xaxis.set_major_formatter(
-                    ticker.FuncFormatter(lambda x, _: f"{x:.3f}")
-                )
+                ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: f'{x:.3f}'))
 
         interval = self.period_length / self.steps_per_period
         pause = int(self.end_period_pause // interval)
