@@ -48,17 +48,12 @@ def get_image_name(col_name):
 class _BarChartRace(CommonChart):
     
     def __init__(self, df, filename, orientation, sort, n_bars, fixed_order, fixed_max,
-             steps_per_period, period_length, end_period_pause, interpolate_period, 
-             period_label, period_template, period_summary_func, perpendicular_bar_func, 
-             colors, title, bar_size, bar_textposition, bar_texttemplate, bar_label_font, 
-             tick_label_font, tick_template, shared_fontdict, scale, fig, writer, 
-             bar_kwargs, fig_kwargs, filter_column_colors, 
-             img_label_folder, tick_label_mode, tick_image_mode,
-             bar_colors=None,
-             custom_tick_values=None):
-
-        self.df = df
-
+                 steps_per_period, period_length, end_period_pause, interpolate_period, 
+                 period_label, period_template, period_summary_func, perpendicular_bar_func, 
+                 colors, title, bar_size, bar_textposition, bar_texttemplate, bar_label_font, 
+                 tick_label_font, tick_template, shared_fontdict, scale, fig, writer, 
+                 bar_kwargs, fig_kwargs, filter_column_colors, 
+                 img_label_folder,tick_label_mode,tick_image_mode):
         self.filename = filename
         self.extension = self.get_extension()
         self.orientation = orientation
@@ -104,8 +99,6 @@ class _BarChartRace(CommonChart):
         self.tick_image_mode = tick_image_mode
         self.img_label_artist = []     #stores image artists
 
-        self.bar_colors = bar_colors
-        self.custom_tick_values = custom_tick_values
 
     def validate_params(self):
         if isinstance(self.filename, str):
@@ -341,11 +334,6 @@ class _BarChartRace(CommonChart):
         return col_filt
         
     def get_bar_colors(self, colors):
-        self.bar_colors = None
-
-        # if self.bar_colors is not None:
-        #     return np.array(self.bar_colors[:self.df_values.shape[1]])
-        
         if colors is None:
             colors = 'dark12'
             if self.df_values.shape[1] > 10:
@@ -436,9 +424,7 @@ class _BarChartRace(CommonChart):
 
     def get_subplots_adjust(self):
         import io
-        # fig = plt.Figure(**self.fig_kwargs, tight_layout=False)
-        fig = plt.Figure(**self.fig_kwargs)
-        
+        fig = plt.Figure(**self.fig_kwargs, tight_layout=False)
         ax = fig.add_subplot()
         plot_func = ax.barh if self.orientation == 'h' else ax.bar
         bar_location, bar_length, cols, _ = self.get_bar_info(-1)
@@ -495,8 +481,7 @@ class _BarChartRace(CommonChart):
                 ax.set_ylim(None, self.fixed_max_value)
 
     def create_figure(self):
-        # fig = plt.Figure(**self.fig_kwargs, tight_layout=False)
-        fig = plt.Figure(**self.fig_kwargs)
+        fig = plt.Figure(**self.fig_kwargs, tight_layout=False)
 
         ax = fig.add_subplot()
         # left, bottom = self.subplots_adjust
@@ -520,70 +505,34 @@ class _BarChartRace(CommonChart):
             axis.set_major_formatter(self.tick_template)
 
     def plot_bars(self, ax, i):
-        bar_location = np.arange(len(self.df_values.columns))
-        bar_length = self.df_values.iloc[i].values
-        cols = self.df_values.columns
-        
-        # ✅ X軸範囲固定（勝率 0.000〜1.000）
-        ax.set_xlim(0, 1.0)
-
-        # ✅ X軸ラベルを 0.200 刻み（小数第3位まで）
-        ax.set_xticks(np.arange(0, 1.01, 0.2))
-        ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: f"{x:.3f}"))
-
-        # ✅ バーカラーの適用
-        if self.bar_colors is not None:
-            if isinstance(self.bar_colors, np.ndarray):
-                colors = self.bar_colors
-            elif isinstance(self.bar_colors, dict):
-                colors = [self.bar_colors.get(c, "#999999") for c in cols]
-            else:
-                colors = "#999999"
-        else:
-            colors = "#999999"
-        
-        # ✅ X軸カスタム（custom_tick_values）
-        if hasattr(self, "custom_tick_values") and self.custom_tick_values is not None:
-            ax.set_xticks(self.custom_tick_values)
-            ax.xaxis.set_major_formatter(
-                ticker.FuncFormatter(lambda x, _: f"{x:.3f}")
-            )
-
-        if self.orientation == "h":
-            ax.barh(bar_location, bar_length, tick_label=cols, color=colors, **self.bar_kwargs)
-        else:
-            ax.bar(bar_location, bar_length, tick_label=cols, color=colors, **self.bar_kwargs)
-
         bar_location, bar_length, cols, colors = self.get_bar_info(i)
-    
         if self.orientation == 'h':
             ax.barh(bar_location, bar_length, tick_label=cols, 
                     color=colors, **self.bar_kwargs)
-            ax.set_yticklabels(ax.get_yticklabels(), **self.tick_label_font, wrap=True)
-    
+            ax.set_yticklabels(ax.get_yticklabels(), **self.tick_label_font,wrap=True)#,visible=False)
+            #ax.set_yticklabels([])
+            #ax.tick_params(top=False, bottom=False, left=False, right=False, labelleft=True, labelbottom=True)
             if not self.fixed_max and self.bar_textposition == 'outside':
                 max_bar = bar_length.max()
                 new_max_pixels = ax.transData.transform((max_bar, 0))[0] + self.extra_pixels
                 new_xmax = ax.transData.inverted().transform((new_max_pixels, 0))[0]
-                ax.set_xlim(ax.get_xlim()[0], new_xmax)
-    
+                ax.set_xlim(ax.get_xlim()[0] , new_xmax)
         else:
             ax.bar(bar_location, bar_length, tick_label=cols, 
                    color=colors, **self.bar_kwargs)
             ax.set_xticklabels(ax.get_xticklabels(), **self.tick_label_font)
-    
             if not self.fixed_max and self.bar_textposition == 'outside':
                 max_bar = bar_length.max()
                 new_max_pixels = ax.transData.transform((0, max_bar))[1] + self.extra_pixels
                 new_ymax = ax.transData.inverted().transform((0, new_max_pixels))[1]
                 ax.set_ylim(ax.get_ylim()[0], new_ymax)
-    
-        # ✅ チームロゴ画像などの描画
-        if self.img_label_folder:
-            for bar_loc, bar_len, col_name in zip(bar_location, bar_length, cols):
-                self._add_tick_label_offset_image(bar_loc, bar_len, col_name, ax)
-    
-        # ✅ 追加描画要素
+
+        if self.img_label_folder:           #here I am handling the addition of images as the bar tick labels
+            zipped = zip(bar_location,bar_length,cols)
+            for bar_loc,bar_len,col_name in zipped:
+                #self.offset_image(bar_loc,bar_len,col_name,ax)
+                self._add_tick_label_offset_image(bar_loc,bar_len,col_name,ax)
+
         self.set_major_formatter(ax)
         self.add_period_label(ax, i)
         self.add_period_summary(ax, i)
@@ -686,16 +635,12 @@ class _BarChartRace(CommonChart):
         self.plot_bars(ax, i)
         # self.fig.tight_layout()
         
+        
     def make_animation(self):
         def init_func():
             ax = self.fig.axes[0]
             self.plot_bars(ax, 0)
             # self.fig.tight_layout()
-
-            # ✅ x軸カスタム反映
-            if hasattr(self, 'custom_tick_values') and self.custom_tick_values is not None:
-                ax.set_xticks(self.custom_tick_values)
-                ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: f'{x:.3f}'))
 
         interval = self.period_length / self.steps_per_period
         pause = int(self.end_period_pause // interval)
@@ -715,13 +660,24 @@ class _BarChartRace(CommonChart):
         try:
             fc = self.fig.get_facecolor()
             if fc == (1, 1, 1, 0):
-                fc = "white"
-            savefig_kwargs = {"facecolor": fc}
-            ret_val = anim.save(
-                self.filename, fps=20, writer=self.writer, savefig_kwargs=savefig_kwargs
-            )
+                fc = 'white'
+            savefig_kwargs = {'facecolor': fc}
+            if self.html:
+                ret_val = anim.to_html5_video(savefig_kwargs=savefig_kwargs)
+                try:
+                    from IPython.display import HTML
+                    ret_val = HTML(ret_val)
+                except ImportError:
+                    pass
+            else:
+                fc = self.fig.get_facecolor()
+                if fc == (1, 1, 1, 0):
+                    fc = 'white'
+                ret_val = anim.save(self.filename, fps=self.fps, writer=self.writer, 
+                                    savefig_kwargs=savefig_kwargs) 
         except Exception as e:
-            raise Exception(str(e))
+            message = str(e)
+            raise Exception(message)
         finally:
             plt.rcParams = self.orig_rcParams
 
@@ -732,18 +688,12 @@ def bar_chart_race(df, filename=None, orientation='h', sort='desc', n_bars=None,
                    fixed_order=False, fixed_max=False, steps_per_period=10, 
                    period_length=500, end_period_pause=0, interpolate_period=False, 
                    period_label=True, period_template=None, period_summary_func=None,
-                   perpendicular_bar_func=None,
-                   colors=None,
-                   title=None, bar_size=.95,
+                   perpendicular_bar_func=None, colors=None, title=None, bar_size=.95,
                    bar_textposition='outside', bar_texttemplate='{x:,.0f}',
                    bar_label_font=None, tick_label_font=None, tick_template='{x:,.0f}',
                    shared_fontdict=None, scale='linear', fig=None, writer=None, bar_kwargs=None, 
                    fig_kwargs=None, filter_column_colors=False,
-                   img_label_folder=None, tick_label_mode='image', tick_image_mode='trailing',
-                   bar_colors=None,
-                   custom_tick_values=None):
- 
-
+                   img_label_folder=None,tick_label_mode='image',tick_image_mode='trailing'):
     '''
     Create an animated bar chart race using matplotlib. Data must be in 
     'wide' format where each row represents a single time period and each 
@@ -1123,7 +1073,5 @@ def bar_chart_race(df, filename=None, orientation='h', sort='desc', n_bars=None,
                         colors, title, bar_size, bar_textposition, bar_texttemplate, 
                         bar_label_font, tick_label_font, tick_template, shared_fontdict, scale, 
                         fig, writer, bar_kwargs, fig_kwargs, filter_column_colors, 
-                        img_label_folder,tick_label_mode,tick_image_mode,
-                        bar_colors=bar_colors,
-                       custom_tick_values=custom_tick_values) 
+                        img_label_folder,tick_label_mode,tick_image_mode)
     return bcr.make_animation()
