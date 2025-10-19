@@ -506,6 +506,17 @@ class _BarChartRace(CommonChart):
 
     def plot_bars(self, ax, i):
         bar_location, bar_length, cols, colors = self.get_bar_info(i)
+        
+        # ✅ numpy.ndarray対策
+        if isinstance(cols, np.ndarray):
+            cols = cols.tolist()
+
+        # ✅ カスタムチームカラー適用
+        if self.bar_colors is not None:
+            colors = [self.bar_colors.get(c, "#999999") for c in cols]
+        else:
+            colors = plt.cm.tab20.colors
+
         if self.orientation == 'h':
             ax.barh(bar_location, bar_length, tick_label=cols, 
                     color=colors, **self.bar_kwargs)
@@ -641,6 +652,11 @@ class _BarChartRace(CommonChart):
             ax = self.fig.axes[0]
             self.plot_bars(ax, 0)
             # self.fig.tight_layout()
+
+        # ✅ x軸を0.0〜1.0の0.2刻みに設定
+        import matplotlib.ticker as mticker
+        ax.set_xticks([0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
+        ax.xaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f"{x:.3f}"))
 
         interval = self.period_length / self.steps_per_period
         pause = int(self.end_period_pause // interval)
