@@ -4,7 +4,6 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import ticker
-import matplotlib.ticker as ticker
 from ._func_animation import FuncAnimation
 from matplotlib.colors import Colormap
 
@@ -512,17 +511,7 @@ class _BarChartRace(CommonChart):
         if isinstance(cols, np.ndarray):
             cols = cols.tolist()
 
-        # ✅ カスタムチームカラー適用
-        if self.bar_colors is not None:
-            colors = [self.bar_colors.get(c, "#999999") for c in cols]
-        else:
-            colors = plt.cm.tab20.colors
-
         if self.orientation == 'h':
-            ax.set_xlim(0, 1.0)
-            ax.set_xticks([0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
-            ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: f"{x:.3f}"))
-            
             ax.barh(bar_location, bar_length, tick_label=cols, 
                     color=colors, **self.bar_kwargs)
             ax.set_yticklabels(ax.get_yticklabels(), **self.tick_label_font,wrap=True)#,visible=False)
