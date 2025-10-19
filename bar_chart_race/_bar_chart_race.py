@@ -541,9 +541,9 @@ class _BarChartRace(CommonChart):
         self.add_bar_labels(ax, bar_location, bar_length)
         self.add_perpendicular_bar(ax, bar_length, i)
     
-        # === ★【追加】X軸を0.000〜1.000、0.200刻み・3桁表示に固定 ===
+        # === ★【追加】X軸 0.000〜1.000固定、小数3桁 + はみ出し対策 ===
         if self.orientation == 'h':
-            ax.set_xlim(0, 1.0)
+            ax.set_xlim(0, 1.05)  # ← 右端5%余白を確保
             ax.set_xticks([0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
             ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: f"{x:.3f}"))
 
