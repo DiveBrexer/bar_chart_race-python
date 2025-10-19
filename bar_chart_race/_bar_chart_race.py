@@ -521,7 +521,8 @@ class _BarChartRace(CommonChart):
 
     def plot_bars(self, ax, i):
         bar_location = np.arange(len(self.df.columns))
-        bar_length = self.df.iloc[i].values
+        # bar_length = self.df.iloc[i].values
+        bar_length = self.df_values.iloc[i].values
         cols = self.df.columns
 
         # ✅ バーカラーの適用
