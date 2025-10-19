@@ -520,11 +520,10 @@ class _BarChartRace(CommonChart):
             axis.set_major_formatter(self.tick_template)
 
     def plot_bars(self, ax, i):
-        bar_location = np.arange(len(self.df.columns))
-        # bar_length = self.df.iloc[i].values
+        bar_location = np.arange(len(self.df_values.columns))
         bar_length = self.df_values.iloc[i].values
-        cols = self.df.columns
-
+        cols = self.df_values.columns
+        
         # ✅ バーカラーの適用
         if self.bar_colors is not None:
             if isinstance(self.bar_colors, np.ndarray):
