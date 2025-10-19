@@ -57,6 +57,8 @@ class _BarChartRace(CommonChart):
              bar_colors=None,
              custom_tick_values=None):
 
+        self.df = df
+
         self.filename = filename
         self.extension = self.get_extension()
         self.orientation = orientation
