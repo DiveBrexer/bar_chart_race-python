@@ -555,6 +555,12 @@ class _BarChartRace(CommonChart):
         self.add_bar_labels(ax, bar_location, bar_length)
         self.add_perpendicular_bar(ax, bar_length, i)
 
+        # === ★【追加】X軸を0.000〜1.000、0.200刻み・3桁表示に固定 ===
+        if self.orientation == 'h':
+            ax.set_xlim(0, 1.0)
+            ax.set_xticks([0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
+            ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: f"{x:.3f}"))
+
     def add_period_label(self, ax, i):
         if self.period_label:
             if self.period_template:
