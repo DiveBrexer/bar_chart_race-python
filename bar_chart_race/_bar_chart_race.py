@@ -99,6 +99,12 @@ class _BarChartRace(CommonChart):
         self.tick_image_mode = tick_image_mode
         self.img_label_artist = []     #stores image artists
 
+        color_file = os.path.join(os.getcwd(), "team_colors.json")
+        if os.path.exists(color_file):
+            with open(color_file, "r", encoding="utf-8") as f:
+                self.bar_colors = json.load(f)
+        else:
+            self.bar_colors = None
 
     def validate_params(self):
         if isinstance(self.filename, str):
