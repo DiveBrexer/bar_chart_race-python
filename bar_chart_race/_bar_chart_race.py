@@ -518,6 +518,10 @@ class _BarChartRace(CommonChart):
             colors = plt.cm.tab20.colors
 
         if self.orientation == 'h':
+            ax.set_xlim(0, 1.0)
+            ax.set_xticks([0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
+            ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: f"{x:.3f}"))
+            
             ax.barh(bar_location, bar_length, tick_label=cols, 
                     color=colors, **self.bar_kwargs)
             ax.set_yticklabels(ax.get_yticklabels(), **self.tick_label_font,wrap=True)#,visible=False)
