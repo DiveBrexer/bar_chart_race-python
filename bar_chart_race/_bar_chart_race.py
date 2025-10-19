@@ -522,14 +522,10 @@ class _BarChartRace(CommonChart):
             axis.set_major_formatter(self.tick_template)
 
     def plot_bars(self, ax, i):
-        import requests
-        from PIL import Image
-        from matplotlib.offsetbox import OffsetImage, AnnotationBbox
-        from io import BytesIO
+        from matplotlib.offsetbox import AnnotationBbox
     
         bar_location, bar_length, cols, colors = self.get_bar_info(i)
-        
-        # ✅ numpy.ndarray対策
+    
         if isinstance(cols, np.ndarray):
             cols = cols.tolist()
     
@@ -552,14 +548,11 @@ class _BarChartRace(CommonChart):
                 new_ymax = ax.transData.inverted().transform((0, new_max_pixels))[1]
                 ax.set_ylim(ax.get_ylim()[0], new_ymax)
     
-        # === ★ チームロゴ描画 ===
+        # === ★ キャッシュ済ロゴを描画 ===
         for bar_loc, team in zip(bar_location, cols):
-            logo_url = self.team_logos.get(team)
-            if logo_url:
+            if team in self.logo_images:
                 try:
-                    response = requests.get(logo_url, timeout=5)
-                    img = Image.open(BytesIO(response.content))
-                    im = OffsetImage(img, zoom=0.08)  # ← サイズ調整
+                    im = self.logo_images[team]
                     ab = AnnotationBbox(
                         im,
                         (0.02, bar_loc),
@@ -577,11 +570,10 @@ class _BarChartRace(CommonChart):
         self.add_bar_labels(ax, bar_location, bar_length)
         self.add_perpendicular_bar(ax, bar_length, i)
     
-        # === ★【右端はみ出し防止 + X軸固定表示】 ===
         if self.orientation == 'h':
             ax.set_xlim(0, 1.2)
             ax.set_xticks([0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
-        ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: f"{x:.3f}"))
+            ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: f"{x:.3f}"))
 
     def add_period_label(self, ax, i):
         if self.period_label:
