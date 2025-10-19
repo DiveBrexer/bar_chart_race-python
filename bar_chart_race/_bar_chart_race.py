@@ -505,50 +505,47 @@ class _BarChartRace(CommonChart):
             axis.set_major_formatter(self.tick_template)
 
     def plot_bars(self, ax, i):
-        bar_location, bar_length, cols, colors = self.get_bar_info(i)
-        
-        # ✅ numpy.ndarray対策
-        if isinstance(cols, np.ndarray):
-            cols = cols.tolist()
+    bar_location, bar_length, cols, colors = self.get_bar_info(i)
+    
+    # ✅ numpy.ndarray対策
+    if isinstance(cols, np.ndarray):
+        cols = cols.tolist()
 
-        if self.orientation == 'h':
-            ax.barh(bar_location, bar_length, tick_label=cols, 
-                    color=colors, **self.bar_kwargs)
-            ax.set_yticklabels(ax.get_yticklabels(), **self.tick_label_font,wrap=True)#,visible=False)
-            #ax.set_yticklabels([])
-            #ax.tick_params(top=False, bottom=False, left=False, right=False, labelleft=True, labelbottom=True)
-            if not self.fixed_max and self.bar_textposition == 'outside':
-                max_bar = bar_length.max()
-                new_max_pixels = ax.transData.transform((max_bar, 0))[0] + self.extra_pixels
-                new_xmax = ax.transData.inverted().transform((new_max_pixels, 0))[0]
-                ax.set_xlim(ax.get_xlim()[0] , new_xmax)
-        else:
-            ax.bar(bar_location, bar_length, tick_label=cols, 
-                   color=colors, **self.bar_kwargs)
-            ax.set_xticklabels(ax.get_xticklabels(), **self.tick_label_font)
-            if not self.fixed_max and self.bar_textposition == 'outside':
-                max_bar = bar_length.max()
-                new_max_pixels = ax.transData.transform((0, max_bar))[1] + self.extra_pixels
-                new_ymax = ax.transData.inverted().transform((0, new_max_pixels))[1]
-                ax.set_ylim(ax.get_ylim()[0], new_ymax)
+    if self.orientation == 'h':
+        ax.barh(bar_location, bar_length, tick_label=cols, 
+                color=colors, **self.bar_kwargs)
+        ax.set_yticklabels(ax.get_yticklabels(), **self.tick_label_font, wrap=True)
+        if not self.fixed_max and self.bar_textposition == 'outside':
+            max_bar = bar_length.max()
+            new_max_pixels = ax.transData.transform((max_bar, 0))[0] + self.extra_pixels
+            new_xmax = ax.transData.inverted().transform((new_max_pixels, 0))[0]
+            ax.set_xlim(ax.get_xlim()[0], new_xmax)
+    else:
+        ax.bar(bar_location, bar_length, tick_label=cols, 
+               color=colors, **self.bar_kwargs)
+        ax.set_xticklabels(ax.get_xticklabels(), **self.tick_label_font)
+        if not self.fixed_max and self.bar_textposition == 'outside':
+            max_bar = bar_length.max()
+            new_max_pixels = ax.transData.transform((0, max_bar))[1] + self.extra_pixels
+            new_ymax = ax.transData.inverted().transform((0, new_max_pixels))[1]
+            ax.set_ylim(ax.get_ylim()[0], new_ymax)
 
-        if self.img_label_folder:           #here I am handling the addition of images as the bar tick labels
-            zipped = zip(bar_location,bar_length,cols)
-            for bar_loc,bar_len,col_name in zipped:
-                #self.offset_image(bar_loc,bar_len,col_name,ax)
-                self._add_tick_label_offset_image(bar_loc,bar_len,col_name,ax)
+    if self.img_label_folder:
+        zipped = zip(bar_location, bar_length, cols)
+        for bar_loc, bar_len, col_name in zipped:
+            self._add_tick_label_offset_image(bar_loc, bar_len, col_name, ax)
 
-        self.set_major_formatter(ax)
-        self.add_period_label(ax, i)
-        self.add_period_summary(ax, i)
-        self.add_bar_labels(ax, bar_location, bar_length)
-        self.add_perpendicular_bar(ax, bar_length, i)
+    self.set_major_formatter(ax)
+    self.add_period_label(ax, i)
+    self.add_period_summary(ax, i)
+    self.add_bar_labels(ax, bar_location, bar_length)
+    self.add_perpendicular_bar(ax, bar_length, i)
 
-        # === ★【追加】X軸を0.000〜1.000、0.200刻み・3桁表示に固定 ===
-        if self.orientation == 'h':
-            ax.set_xlim(0, 1.0)
-            ax.set_xticks([0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
-            ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: f"{x:.3f}"))
+    # === ★【追加】X軸を0.000〜1.000、0.200刻み・3桁表示に固定 ===
+    if self.orientation == 'h':
+        ax.set_xlim(0, 1.0)
+        ax.set_xticks([0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
+        ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: f"{x:.3f}"))
 
     def add_period_label(self, ax, i):
         if self.period_label:
@@ -652,11 +649,6 @@ class _BarChartRace(CommonChart):
             ax = self.fig.axes[0]
             self.plot_bars(ax, 0)
             # self.fig.tight_layout()
-
-        # ✅ x軸を0.0〜1.0の0.2刻みに設定
-        import matplotlib.ticker as mticker
-        ax.set_xticks([0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
-        ax.xaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f"{x:.3f}"))
 
         interval = self.period_length / self.steps_per_period
         pause = int(self.end_period_pause // interval)
