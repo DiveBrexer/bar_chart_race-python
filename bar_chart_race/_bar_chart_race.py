@@ -434,7 +434,9 @@ class _BarChartRace(CommonChart):
 
     def get_subplots_adjust(self):
         import io
-        fig = plt.Figure(**self.fig_kwargs, tight_layout=False)
+        # fig = plt.Figure(**self.fig_kwargs, tight_layout=False)
+        fig = plt.Figure(**self.fig_kwargs)
+        
         ax = fig.add_subplot()
         plot_func = ax.barh if self.orientation == 'h' else ax.bar
         bar_location, bar_length, cols, _ = self.get_bar_info(-1)
