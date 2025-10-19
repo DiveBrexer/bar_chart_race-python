@@ -51,9 +51,13 @@ class _BarChartRace(CommonChart):
                  colors, title, bar_size, bar_textposition, bar_texttemplate, bar_label_font, 
                  tick_label_font, tick_template, shared_fontdict, scale, fig, writer, 
                  bar_kwargs, fig_kwargs, filter_column_colors, 
-                 img_label_folder,tick_label_mode,tick_image_mode):
+                 img_label_folder,tick_label_mode,tick_image_mode,
+                 bar_colors=None,
+                 team_logos=None):
+                     
         self.filename = filename
         self.extension = self.get_extension()
+        self.team_logos = team_logos or {} 
         self.orientation = orientation
         self.sort = sort
         self.n_bars = n_bars or df.shape[1]
@@ -533,19 +537,23 @@ class _BarChartRace(CommonChart):
                 ax.set_ylim(ax.get_ylim()[0], new_ymax)
     
         # === ★ チームロゴ描画 ===
-        if hasattr(self, "team_logos") and self.team_logos:
-            for bar_loc, team in zip(bar_location, cols):
-                if team in self.team_logos:
-                    logo_url = self.team_logos[team]
-                    try:
-                        response = requests.get(logo_url, timeout=5)
-                        img = Image.open(BytesIO(response.content))
-                        im = OffsetImage(img, zoom=0.08)  # ← ロゴサイズ調整
-                        ab = AnnotationBbox(im, (0.02, bar_loc), xycoords=('axes fraction', 'data'),
-                                            frameon=False, box_alignment=(0, 0.5))
-                        ax.add_artist(ab)
-                    except Exception:
-                        continue
+        for bar_loc, team in zip(bar_location, cols):
+            logo_url = self.team_logos.get(team)
+            if logo_url:
+                try:
+                    response = requests.get(logo_url, timeout=5)
+                    img = Image.open(BytesIO(response.content))
+                    im = OffsetImage(img, zoom=0.08)  # ← サイズ調整
+                    ab = AnnotationBbox(
+                        im,
+                        (0.02, bar_loc),
+                        xycoords=('axes fraction', 'data'),
+                        frameon=False,
+                        box_alignment=(0, 0.5)
+                    )
+                    ax.add_artist(ab)
+                except Exception:
+                    continue
     
         self.set_major_formatter(ax)
         self.add_period_label(ax, i)
@@ -557,8 +565,7 @@ class _BarChartRace(CommonChart):
         if self.orientation == 'h':
             ax.set_xlim(0, 1.2)
             ax.set_xticks([0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
-            ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: f"{x:.3f}"))
-
+        ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: f"{x:.3f}"))
 
     def add_period_label(self, ax, i):
         if self.period_label:
