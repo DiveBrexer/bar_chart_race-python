@@ -15,8 +15,6 @@ import os
 from ._common_chart import CommonChart
 from ._utils import prepare_wide_data
 
-
-
 def get_image_label(root_folder,name):
     #path = "data/flags/Flags/flags/flags/24/{}.png".format(name.title())
     path = os.path.join(root_folder , name)
@@ -390,7 +388,6 @@ class _BarChartRace(CommonChart):
         if self.tick_template:
             value_axis.set_major_formatter(self.tick_template)
 
-
         ax.grid(True, axis='x', color='#D3DCE6', linewidth=5, zorder=0)
 
         # ax.tick_params(labelsize=self.tick_label_font['size'], length=0, pad=2)
@@ -541,9 +538,11 @@ class _BarChartRace(CommonChart):
         self.add_bar_labels(ax, bar_location, bar_length)
         self.add_perpendicular_bar(ax, bar_length, i)
     
-        # === ★【追加】X軸 0.000〜1.000固定、小数3桁 + はみ出し対策 ===
+        # === ★【変更】右端はみ出し防止 + X軸固定表示 ===
         if self.orientation == 'h':
-            ax.set_xlim(0, 1.05)  # ← 右端5%余白を確保
+            # 右端を5%余裕を持たせて描画
+            ax.set_xlim(0, 1.05)
+            # 0.0〜1.0の範囲を0.2刻みで表示
             ax.set_xticks([0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
             ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: f"{x:.3f}"))
 
