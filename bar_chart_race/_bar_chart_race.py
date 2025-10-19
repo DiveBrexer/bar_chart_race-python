@@ -493,7 +493,8 @@ class _BarChartRace(CommonChart):
                 ax.set_ylim(None, self.fixed_max_value)
 
     def create_figure(self):
-        fig = plt.Figure(**self.fig_kwargs, tight_layout=False)
+        # fig = plt.Figure(**self.fig_kwargs, tight_layout=False)
+        fig = plt.Figure(**self.fig_kwargs)
 
         ax = fig.add_subplot()
         # left, bottom = self.subplots_adjust
