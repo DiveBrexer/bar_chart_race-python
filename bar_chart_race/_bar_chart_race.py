@@ -502,6 +502,11 @@ class _BarChartRace(CommonChart):
             axis.set_major_formatter(self.tick_template)
 
     def plot_bars(self, ax, i):
+        import requests
+        from PIL import Image
+        from matplotlib.offsetbox import OffsetImage, AnnotationBbox
+        from io import BytesIO
+    
         bar_location, bar_length, cols, colors = self.get_bar_info(i)
         
         # ✅ numpy.ndarray対策
@@ -527,10 +532,20 @@ class _BarChartRace(CommonChart):
                 new_ymax = ax.transData.inverted().transform((0, new_max_pixels))[1]
                 ax.set_ylim(ax.get_ylim()[0], new_ymax)
     
-        if self.img_label_folder:
-            zipped = zip(bar_location, bar_length, cols)
-            for bar_loc, bar_len, col_name in zipped:
-                self._add_tick_label_offset_image(bar_loc, bar_len, col_name, ax)
+        # === ★ チームロゴ描画 ===
+        if hasattr(self, "team_logos") and self.team_logos:
+            for bar_loc, team in zip(bar_location, cols):
+                if team in self.team_logos:
+                    logo_url = self.team_logos[team]
+                    try:
+                        response = requests.get(logo_url, timeout=5)
+                        img = Image.open(BytesIO(response.content))
+                        im = OffsetImage(img, zoom=0.08)  # ← ロゴサイズ調整
+                        ab = AnnotationBbox(im, (0.02, bar_loc), xycoords=('axes fraction', 'data'),
+                                            frameon=False, box_alignment=(0, 0.5))
+                        ax.add_artist(ab)
+                    except Exception:
+                        continue
     
         self.set_major_formatter(ax)
         self.add_period_label(ax, i)
@@ -538,14 +553,12 @@ class _BarChartRace(CommonChart):
         self.add_bar_labels(ax, bar_location, bar_length)
         self.add_perpendicular_bar(ax, bar_length, i)
     
-        # === ★【変更】右端はみ出し防止 + X軸固定表示 ===
+        # === ★【右端はみ出し防止 + X軸固定表示】 ===
         if self.orientation == 'h':
-            # 右端を5%余裕を持たせて描画
-            # ax.set_xlim(0, 1.05)
             ax.set_xlim(0, 1.2)
-            # 0.0〜1.0の範囲を0.2刻みで表示
             ax.set_xticks([0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
             ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: f"{x:.3f}"))
+
 
     def add_period_label(self, ax, i):
         if self.period_label:
