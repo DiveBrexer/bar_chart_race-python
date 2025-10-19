@@ -541,7 +541,8 @@ class _BarChartRace(CommonChart):
         # === ★【変更】右端はみ出し防止 + X軸固定表示 ===
         if self.orientation == 'h':
             # 右端を5%余裕を持たせて描画
-            ax.set_xlim(0, 1.05)
+            # ax.set_xlim(0, 1.05)
+            ax.set_xlim(0, 1.2)
             # 0.0〜1.0の範囲を0.2刻みで表示
             ax.set_xticks([0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
             ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: f"{x:.3f}"))
