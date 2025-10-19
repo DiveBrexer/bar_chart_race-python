@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import ticker
+import matplotlib.ticker as ticker
 from ._func_animation import FuncAnimation
 from matplotlib.colors import Colormap
 
