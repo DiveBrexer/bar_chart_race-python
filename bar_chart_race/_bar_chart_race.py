@@ -54,10 +54,17 @@ class _BarChartRace(CommonChart):
                  img_label_folder,tick_label_mode,tick_image_mode,
                  bar_colors=None,
                  team_logos=None):
-                     
+
+        import requests
+        from PIL import Image
+        from io import BytesIO
+        from matplotlib.offsetbox import OffsetImage
+
         self.filename = filename
         self.extension = self.get_extension()
         self.team_logos = team_logos or {} 
+        self.logo_images = {}
+                     
         self.orientation = orientation
         self.sort = sort
         self.n_bars = n_bars or df.shape[1]
@@ -100,6 +107,15 @@ class _BarChartRace(CommonChart):
         self.tick_label_mode = tick_label_mode
         self.tick_image_mode = tick_image_mode
         self.img_label_artist = []     #stores image artists
+
+        # === ★ ロゴをキャッシュ（最初に一度だけ取得） ===
+        for team, url in self.team_logos.items():
+            try:
+                response = requests.get(url, timeout=5)
+                img = Image.open(BytesIO(response.content))
+                self.logo_images[team] = OffsetImage(img, zoom=0.08)
+            except Exception:
+                continue
 
 
     def validate_params(self):
