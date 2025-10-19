@@ -506,6 +506,26 @@ class _BarChartRace(CommonChart):
 
     def plot_bars(self, ax, i):
         bar_location, bar_length, cols, colors = self.get_bar_info(i)
+
+        bar_location = np.arange(len(self.df_values.columns))
+        bar_length = self.df_values.iloc[i].values
+        cols = self.df_values.columns
+
+        # ✅ numpy.ndarray対策：colsがndarrayの場合にリストへ変換
+        if isinstance(cols, np.ndarray):
+            cols = cols.tolist()
+
+        # ✅ bar_colorsがNoneの場合はデフォルト色、存在しないチームはグレー
+        if self.bar_colors is not None:
+            colors = [self.bar_colors.get(c, (0.6, 0.6, 0.6)) for c in cols]
+        else:
+            colors = plt.cm.tab20.colors
+
+        # ✅ 勝率 0.0〜1.0 の範囲で固定
+        ax.set_xlim(0, 1.0)
+        ax.set_xticks([0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
+        ax.xaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(lambda x, _: f"{x:.3f}"))
+
         if self.orientation == 'h':
             ax.barh(bar_location, bar_length, tick_label=cols, 
                     color=colors, **self.bar_kwargs)
