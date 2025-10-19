@@ -515,10 +515,33 @@ class _BarChartRace(CommonChart):
             axis.set_major_formatter(self.tick_template)
 
     def plot_bars(self, ax, i):
-        if hasattr(self, 'custom_tick_values') and self.custom_tick_values is not None:
+        bar_location = np.arange(len(self.df.columns))
+        bar_length = self.df.iloc[i].values
+        cols = self.df.columns
+
+        # ✅ バーカラーの適用
+        if self.bar_colors is not None:
+            if isinstance(self.bar_colors, np.ndarray):
+                colors = self.bar_colors
+            elif isinstance(self.bar_colors, dict):
+                colors = [self.bar_colors.get(c, "#999999") for c in cols]
+            else:
+                colors = "#999999"
+        else:
+            colors = "#999999"
+        
+        # ✅ X軸カスタム（custom_tick_values）
+        if hasattr(self, "custom_tick_values") and self.custom_tick_values is not None:
             ax.set_xticks(self.custom_tick_values)
-            ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: f'{x:.3f}'))
-    
+            ax.xaxis.set_major_formatter(
+                ticker.FuncFormatter(lambda x, _: f"{x:.3f}")
+            )
+
+        if self.orientation == "h":
+            ax.barh(bar_location, bar_length, tick_label=cols, color=colors, **self.bar_kwargs)
+        else:
+            ax.bar(bar_location, bar_length, tick_label=cols, color=colors, **self.bar_kwargs)
+
         bar_location, bar_length, cols, colors = self.get_bar_info(i)
     
         if self.orientation == 'h':
@@ -657,11 +680,12 @@ class _BarChartRace(CommonChart):
             ax = self.fig.axes[0]
             self.plot_bars(ax, 0)
             # self.fig.tight_layout()
-            
-            if hasattr(self, 'custom_tick_values') and self.custom_tick_values is not None:
+
+            # ✅ x軸カスタム反映
+            if hasattr(self, "custom_tick_values") and self.custom_tick_values is not None:
                 ax.set_xticks(self.custom_tick_values)
                 ax.xaxis.set_major_formatter(
-                    ticker.FuncFormatter(lambda x, _: f'{x:.3f}')
+                    ticker.FuncFormatter(lambda x, _: f"{x:.3f}")
                 )
 
         interval = self.period_length / self.steps_per_period
@@ -682,24 +706,13 @@ class _BarChartRace(CommonChart):
         try:
             fc = self.fig.get_facecolor()
             if fc == (1, 1, 1, 0):
-                fc = 'white'
-            savefig_kwargs = {'facecolor': fc}
-            if self.html:
-                ret_val = anim.to_html5_video(savefig_kwargs=savefig_kwargs)
-                try:
-                    from IPython.display import HTML
-                    ret_val = HTML(ret_val)
-                except ImportError:
-                    pass
-            else:
-                fc = self.fig.get_facecolor()
-                if fc == (1, 1, 1, 0):
-                    fc = 'white'
-                ret_val = anim.save(self.filename, fps=self.fps, writer=self.writer, 
-                                    savefig_kwargs=savefig_kwargs) 
+                fc = "white"
+            savefig_kwargs = {"facecolor": fc}
+            ret_val = anim.save(
+                self.filename, fps=20, writer=self.writer, savefig_kwargs=savefig_kwargs
+            )
         except Exception as e:
-            message = str(e)
-            raise Exception(message)
+            raise Exception(str(e))
         finally:
             plt.rcParams = self.orig_rcParams
 
@@ -1102,5 +1115,6 @@ def bar_chart_race(df, filename=None, orientation='h', sort='desc', n_bars=None,
                         bar_label_font, tick_label_font, tick_template, shared_fontdict, scale, 
                         fig, writer, bar_kwargs, fig_kwargs, filter_column_colors, 
                         img_label_folder,tick_label_mode,tick_image_mode,
-                        bar_colors=bar_colors) 
+                        bar_colors=bar_colors,
+                       custom_tick_values=custom_tick_values) 
     return bcr.make_animation()
